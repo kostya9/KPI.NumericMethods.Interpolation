@@ -80,6 +80,7 @@ namespace KPI.NumericMethods.Interpolation
             var node = SelectedNode;
             Nodes.Remove(node);
             SeriesViewModel.Remove(node);
+            SeriesViewModel.SetLineChart(Nodes);
         }
     }
 }
