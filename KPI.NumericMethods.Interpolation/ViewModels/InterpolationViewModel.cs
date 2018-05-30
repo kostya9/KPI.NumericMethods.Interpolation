@@ -9,38 +9,19 @@ namespace KPI.NumericMethods.Interpolation
 {
     public class InterpolationViewModel : Screen
     {
+        private BindableCollection<Node> _nodes;
+        private Node _selected;
+        private double _interpolated;
+        private SeriesViewModel _seriesViewModel;
+
         public BindableCollection<Node> Nodes
         {
             get => _nodes;
             set
             {
-                _nodes = value;
-                NotifyOfPropertyChange();
-            }
-        }
-        public SeriesViewModel SeriesViewModel
-        {
-            get => _seriesViewModel;
-            set
-            {
-                _seriesViewModel = value;
-                NotifyOfPropertyChange();
-            }
-        }
-
-        private Node _selected;
-        private SeriesViewModel _seriesViewModel;
-        private BindableCollection<Node> _nodes;
-        private double _interpolated;
-
-        public double Interpolated
-        {
-            get { return _interpolated; }
-            set
-            {
-                if (_interpolated != value)
+                if (_nodes != value)
                 {
-                    _interpolated = value;
+                    _nodes = value;
                     NotifyOfPropertyChange();
                 }
             }
@@ -56,6 +37,29 @@ namespace KPI.NumericMethods.Interpolation
                     _selected = value;
                     NotifyOfPropertyChange();
                 }
+            }
+        }
+
+        public double Interpolated
+        {
+            get { return _interpolated; }
+            set
+            {
+                if (_interpolated != value)
+                {
+                    _interpolated = value;
+                    NotifyOfPropertyChange();
+                }
+            }
+        }
+
+        public SeriesViewModel SeriesViewModel
+        {
+            get => _seriesViewModel;
+            set
+            {
+                _seriesViewModel = value;
+                NotifyOfPropertyChange();
             }
         }
 
@@ -109,7 +113,6 @@ namespace KPI.NumericMethods.Interpolation
         public void InterpolatePoint(string interpolateFrom)
         {
             Interpolated = SecondNewton.InterpolateFrom(Nodes, double.Parse(interpolateFrom)).Result;
-
         }
     }
 }

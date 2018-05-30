@@ -10,18 +10,8 @@ namespace KPI.NumericMethods.Interpolation
 {
     public class SeriesViewModel : PropertyChangedBase
     {
-        private SeriesCollection _series;
         private ScatterSeries _scatter;
-
-        public SeriesCollection Series
-        {
-            get => _series;
-            set
-            {
-                _series = value;
-                NotifyOfPropertyChange();
-            }
-        }
+        public SeriesCollection Series { get;  }
 
         public SeriesViewModel(IEnumerable<Node> initial)
         {
@@ -34,7 +24,8 @@ namespace KPI.NumericMethods.Interpolation
                     Y = n.Y
                 }))
             };
-            _series = new SeriesCollection()
+
+            Series = new SeriesCollection()
             {
                 _scatter
             };
