@@ -39,7 +39,7 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
             return calculated;
         }
 
-        public void Interpolate(double xValue)
+        private void Interpolate(double xValue)
         {
             var prepared = _values
                     .Select((v, i) => (v, i + 1));
