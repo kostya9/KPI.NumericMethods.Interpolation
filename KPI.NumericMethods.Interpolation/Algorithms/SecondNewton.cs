@@ -37,7 +37,6 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
                     / (_values[i + length - 1].X - _values[i].X);
             _cache[key] = calculated;
             return calculated;
-
         }
 
         public void Interpolate(double xValue)
