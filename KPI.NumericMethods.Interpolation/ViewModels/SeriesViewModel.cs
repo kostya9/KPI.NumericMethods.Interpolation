@@ -38,7 +38,6 @@ namespace KPI.NumericMethods.Interpolation
             {
                 _scatter
             };
-            SetLineChart(initial);
         }
 
         public void Add(Node n)
@@ -48,26 +47,6 @@ namespace KPI.NumericMethods.Interpolation
                 X = n.X,
                 Y = n.Y
             });
-        }
-
-        public void SetLineChart(IEnumerable<Node> nodes)
-        {
-            var lineSeries = new LineSeries()
-            {
-                Title = "Interpolated",
-                Values = new ChartValues<ScatterPoint>(nodes.Select(n => new ScatterPoint()
-                {
-                    X = n.X,
-                    Y = n.Y
-                })),
-                PointGeometry = null,
-                AreaLimit = 0
-            };
-
-            var oldLineSeries = _series.FirstOrDefault(e => e is LineSeries);
-            if (oldLineSeries != null)
-                _series.Remove(oldLineSeries);
-            _series.Add(lineSeries);
         }
 
         public void Remove(Node n)

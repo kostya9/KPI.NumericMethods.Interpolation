@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using KPI.NumericMethods.Interpolation.Algorithms;
 using KPI.NumericMethods.Interpolation.Extensions;
 using KPI.NumericMethods.Interpolation.Models;
 using System;
@@ -27,24 +28,43 @@ namespace KPI.NumericMethods.Interpolation
             }
         }
 
-        private Node selected;
+        private Node _selected;
         private SeriesViewModel _seriesViewModel;
         private BindableCollection<Node> _nodes;
+        private double _interpolated;
+
+        public double Interpolated
+        {
+            get { return _interpolated; }
+            set
+            {
+                if (_interpolated != value)
+                {
+                    _interpolated = value;
+                    NotifyOfPropertyChange();
+                }
+            }
+        }
 
         public Node SelectedNode
         {
-            get { return selected; }
+            get { return _selected; }
             set
             {
-                if (selected != value)
+                if (_selected != value)
                 {
-                    selected = value;
+                    _selected = value;
                     NotifyOfPropertyChange();
                 }
             }
         }
 
         public InterpolationViewModel()
+        {
+            Reset();
+        }
+
+        public void Reset()
         {
             Nodes = new BindableCollection<Node>();
             SeriesViewModel = new SeriesViewModel(Enumerable.Empty<Node>());
@@ -72,7 +92,6 @@ namespace KPI.NumericMethods.Interpolation
             var node = Node.From((parsedPoint, parsedValue));
             Nodes.InsertSorted(node);
             SeriesViewModel.Add(node);
-            SeriesViewModel.SetLineChart(Nodes);
         }
 
         public void RemoveItem()
@@ -80,7 +99,17 @@ namespace KPI.NumericMethods.Interpolation
             var node = SelectedNode;
             Nodes.Remove(node);
             SeriesViewModel.Remove(node);
-            SeriesViewModel.SetLineChart(Nodes);
+        }
+
+        public bool CanInterpolatePoint(string interpolateFrom)
+        {
+            return double.TryParse(interpolateFrom, out _);
+        }
+
+        public void InterpolatePoint(string interpolateFrom)
+        {
+            Interpolated = SecondNewton.InterpolateFrom(Nodes, double.Parse(interpolateFrom)).Result;
+
         }
     }
 }
