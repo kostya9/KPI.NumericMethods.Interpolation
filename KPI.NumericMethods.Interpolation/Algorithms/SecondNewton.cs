@@ -39,7 +39,7 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
             return calculated;
         }
 
-        private void Interpolate(double xValue)
+        private void Interpolate(double point)
         {
             var prepared = _values
                     .Select((v, i) => (v, i + 1));
@@ -48,7 +48,7 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
                 .Reverse()
                 .Aggregate<(Node v, int i), double>(0, (acc, el) => acc 
                     + GetDelta(0, _values.Take(el.i).ToArray()) 
-                        * _values.Take(el.i - 1).Select(v => v.X).Aggregate<double, double>(1, (xAcc, x) => xAcc * (xValue - x)));
+                        * _values.Take(el.i - 1).Select(v => v.X).Aggregate<double, double>(1, (xAcc, x) => xAcc * (point - x)));
         }
 
         public static SecondNewton InterpolateFrom(IEnumerable<Node> nodes, double value)
