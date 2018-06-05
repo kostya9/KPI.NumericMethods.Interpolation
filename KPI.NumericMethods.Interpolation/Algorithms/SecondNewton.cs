@@ -62,20 +62,20 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
             return _values.Length;
         }
 
-        private double CalculateDelta(int i, int length)
+        private double CalculateDelta(int from, int length)
         {
             if (length == 1)
-                return _values[i].Y;
+                return _values[from].Y;
 
-            return (GetCachedDelta(i + 1, length - 1) - GetCachedDelta(i, length - 1))
-                    / (_values[i + length - 1].X - _values[i].X);
+            return (GetCachedDelta(from + 1, length - 1) - GetCachedDelta(from, length - 1))
+                    / (_values[from + length - 1].X - _values[from].X);
         }
 
-        private string GetCacheKey(int i, int length)
-            => $"{i}: {length}";
+        private string GetCacheKey(int from, int length)
+            => $"{from}: {length}";
 
-        private double GetCachedDelta(int i, int length)
-            => _cache[GetCacheKey(i, length)];
+        private double GetCachedDelta(int from, int length)
+            => _cache[GetCacheKey(from, length)];
 
         public static SecondNewton InterpolateFrom(IEnumerable<Node> nodes, double value)
         {
