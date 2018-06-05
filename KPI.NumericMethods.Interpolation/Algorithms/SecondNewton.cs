@@ -24,9 +24,9 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
         {
             int stoppedAt = PopulateCache();
 
-            var prepared = Enumerable.Range(1, stoppedAt - 1);
+            var lengths = Enumerable.Range(1, stoppedAt - 1);
 
-            Result = prepared
+            Result = lengths
                 .Aggregate<int, double>(0, (acc, length) => acc
                     + GetCachedDelta(0, length)
                         * _values.Take(length - 1).Select(v => v.X).Aggregate<double, double>(1, (xAcc, x) => xAcc * (point - x)));
