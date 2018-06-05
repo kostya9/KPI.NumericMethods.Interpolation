@@ -22,10 +22,10 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
 
         private void Interpolate(double point)
         {
-            int stopped = PopulateCache();
+            int stoppedAt = PopulateCache();
 
             var prepared = _values
-                    .Take(stopped)
+                    .Take(stoppedAt)
                     .Select((v, i) => (v, i + 1));
 
             Result = prepared
@@ -34,6 +34,10 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
                         * _values.Take(el.i - 1).Select(v => v.X).Aggregate<double, double>(1, (xAcc, x) => xAcc * (point - x)));
         }
 
+        /// <summary>
+        /// Populates cache and returns the length of latest populated entry
+        /// </summary>
+        /// <returns>The length of latest populated entry</returns>
         private int PopulateCache()
         {
             var d = 2;
@@ -42,6 +46,7 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
             for (int i = 1; i <= _values.Length; i++)
             {
                 bool isLargerThanEpsilon = false;
+
                 for (int j = 0; j + i <= _values.Length; j++)
                 {
                     var delta = CalculateDelta(j, i);
@@ -51,9 +56,7 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
                 }
 
                 if (!isLargerThanEpsilon)
-                {
                     return i;
-                }
             }
 
             return _values.Length;
