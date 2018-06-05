@@ -81,6 +81,13 @@ namespace KPI.NumericMethods.Interpolation
             SeriesViewModel = new SeriesViewModel(Nodes);
         }
 
+        public void ImportPointsFromTask2()
+        {
+            (double, double)[] tuples = new[] { (0, 0.33), (2.5, 0.39), (5.8, 0.43), (7.9, 0.45)};
+            Nodes = Node.From(tuples).ToSortedBindableCollection();
+            SeriesViewModel = new SeriesViewModel(Nodes);
+        }
+
         public bool CanAddPoint(string point, string value)
         {
             return double.TryParse(point, out _) && double.TryParse(value, out _);

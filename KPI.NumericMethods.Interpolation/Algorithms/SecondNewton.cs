@@ -14,42 +14,65 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
 
         public double Result { get; private set; }
 
-        public SecondNewton(IEnumerable<Node> values)
+        private SecondNewton(IEnumerable<Node> values)
         {
-            _values = values.ToArray();
+            _values = values.OrderByDescending(v => v).ToArray();
             _cache = new Dictionary<string, double>();
-        }
-
-        private double GetDelta(int i, Node[] nodes)
-        {
-            var length = nodes.Length;
-
-            if (length == 1)
-                return _values[i].Y;
-
-            var key = $"[{i}]: {string.Join(",", nodes.Select(n => n.X))}";
-
-            if (_cache.TryGetValue(key, out var cached))
-                return cached;
-
-            var calculated = 
-                (GetDelta(i + 1, nodes.Skip(1).ToArray()) - GetDelta(i, nodes.Take(length - 1).ToArray())) 
-                    / (_values[i + length - 1].X - _values[i].X);
-            _cache[key] = calculated;
-            return calculated;
         }
 
         private void Interpolate(double point)
         {
+            int stopped = PopulateCache();
+
             var prepared = _values
+                    .Take(stopped)
                     .Select((v, i) => (v, i + 1));
 
             Result = prepared
-                .Reverse()
-                .Aggregate<(Node v, int i), double>(0, (acc, el) => acc 
-                    + GetDelta(0, _values.Take(el.i).ToArray()) 
+                .Aggregate<(Node v, int i), double>(0, (acc, el) => acc
+                    + GetCachedDelta(0, el.i)
                         * _values.Take(el.i - 1).Select(v => v.X).Aggregate<double, double>(1, (xAcc, x) => xAcc * (point - x)));
         }
+
+        private int PopulateCache()
+        {
+            var d = 2;
+            var epsilon = 5 * Math.Pow(10, -d);
+
+            for (int i = 1; i <= _values.Length; i++)
+            {
+                bool isLargerThanEpsilon = false;
+                for (int j = 0; j + i <= _values.Length; j++)
+                {
+                    var delta = CalculateDelta(j, i);
+                    _cache[GetCacheKey(j, i)] = delta;
+                    if (delta > epsilon)
+                        isLargerThanEpsilon = true;
+                }
+
+                if (!isLargerThanEpsilon)
+                {
+                    return i;
+                }
+            }
+
+            return _values.Length;
+        }
+
+        private double CalculateDelta(int i, int length)
+        {
+            if (length == 1)
+                return _values[i].Y;
+
+            return (GetCachedDelta(i + 1, length - 1) - GetCachedDelta(i, length - 1))
+                    / (_values[i + length - 1].X - _values[i].X);
+        }
+
+        private string GetCacheKey(int i, int length)
+            => $"{i}: {length}";
+
+        private double GetCachedDelta(int i, int length)
+            => _cache[GetCacheKey(i, length)];
 
         public static SecondNewton InterpolateFrom(IEnumerable<Node> nodes, double value)
         {
