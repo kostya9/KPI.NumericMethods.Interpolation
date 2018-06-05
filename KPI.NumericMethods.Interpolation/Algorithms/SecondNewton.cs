@@ -24,14 +24,12 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
         {
             int stoppedAt = PopulateCache();
 
-            var prepared = _values
-                    .Take(stoppedAt)
-                    .Select((v, i) => (v, i + 1));
+            var prepared = Enumerable.Range(1, stoppedAt - 1);
 
             Result = prepared
-                .Aggregate<(Node v, int i), double>(0, (acc, el) => acc
-                    + GetCachedDelta(0, el.i)
-                        * _values.Take(el.i - 1).Select(v => v.X).Aggregate<double, double>(1, (xAcc, x) => xAcc * (point - x)));
+                .Aggregate<int, double>(0, (acc, from) => acc
+                    + GetCachedDelta(0, from)
+                        * _values.Take(from - 1).Select(v => v.X).Aggregate<double, double>(1, (xAcc, x) => xAcc * (point - x)));
         }
 
         /// <summary>
@@ -43,20 +41,20 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
             var d = 2;
             var epsilon = 5 * Math.Pow(10, -d);
 
-            for (int i = 1; i <= _values.Length; i++)
+            for (int length = 1; length <= _values.Length; length++)
             {
                 bool isLargerThanEpsilon = false;
 
-                for (int j = 0; j + i <= _values.Length; j++)
+                for (int from = 0; from + length <= _values.Length; from++)
                 {
-                    var delta = CalculateDelta(j, i);
-                    _cache[GetCacheKey(j, i)] = delta;
+                    var delta = CalculateDelta(from, length);
+                    _cache[GetCacheKey(from, length)] = delta;
                     if (delta > epsilon)
                         isLargerThanEpsilon = true;
                 }
 
                 if (!isLargerThanEpsilon)
-                    return i;
+                    return length;
             }
 
             return _values.Length;
