@@ -47,14 +47,13 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
 
             Result = powers
                 .Aggregate(_values[baseIndex].Y, (acc, power) => acc 
-                    + (power % 2 == 1 ? q * (GetCachedDelta(-power/2 - 1, power) + GetCachedDelta(-power/2, power)) / 2 : qSquare * GetCachedDelta(-power/2, power)) 
-                    * GetMultiplication(qSquare, (power - 1) / 2));
+                    + (power % 2 == 1 ? q * (CachedDelta(-power/2 - 1, power) + CachedDelta(-power/2, power)) / 2 : qSquare * CachedDelta(-power/2, power)) 
+                    * Multiply(qSquare, (power - 1) / 2));
         }
 
-        private double GetMultiplication(double qSquare, int times)
-        {
-            return Enumerable.Range(1, times).Aggregate<int, double>(1, (acc, cur) => acc * (qSquare - cur * cur));
-        }
+        // (q^2 - 1) * (q^2 - 2) ...
+        private double Multiply(double qSquare, int times)
+            => Enumerable.Range(1, times).Aggregate<int, double>(1, (acc, cur) => acc * (qSquare - cur * cur));
 
         /// <summary>
         /// Populates cache and returns the length of latest populated entry
@@ -89,20 +88,20 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
             if (power == 0)
                 return _values[baseIndex + from].Y;
 
-            return (GetCachedDelta(from + 1, power - 1) - GetCachedDelta(from, power - 1));
+            return (CachedDelta(from + 1, power - 1) - CachedDelta(from, power - 1));
         }
 
         private string GetCacheKey(int from, int power)
             => $"{from}: {power}";
 
-        private double GetCachedDelta(int from, int power)
+        private double CachedDelta(int from, int power)
             => _cache[GetCacheKey(from, power)];
 
         public static Stirling InterpolateFrom(IEnumerable<Node> nodes, double value)
         {
-            var newton = new Stirling(nodes);
-            newton.Interpolate(value);
-            return newton;
+            var stirling = new Stirling(nodes);
+            stirling.Interpolate(value);
+            return stirling;
         }
     }
 }

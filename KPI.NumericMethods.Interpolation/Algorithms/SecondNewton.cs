@@ -28,7 +28,7 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
 
             Result = lengths
                 .Aggregate<int, double>(0, (acc, length) => acc
-                    + GetCachedDelta(0, length)
+                    + CachedDelta(0, length)
                         * _values.Take(length - 1).Select(v => v.X).Aggregate<double, double>(1, (xAcc, x) => xAcc * (point - x)));
         }
 
@@ -65,14 +65,14 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
             if (length == 1)
                 return _values[from].Y;
 
-            return (GetCachedDelta(from + 1, length - 1) - GetCachedDelta(from, length - 1))
+            return (CachedDelta(from + 1, length - 1) - CachedDelta(from, length - 1))
                     / (_values[from + length - 1].X - _values[from].X);
         }
 
         private string GetCacheKey(int from, int length)
             => $"{from}: {length}";
 
-        private double GetCachedDelta(int from, int length)
+        private double CachedDelta(int from, int length)
             => _cache[GetCacheKey(from, length)];
 
         public static SecondNewton InterpolateFrom(IEnumerable<Node> nodes, double value)
