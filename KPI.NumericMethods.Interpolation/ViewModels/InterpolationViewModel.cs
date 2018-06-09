@@ -83,7 +83,7 @@ namespace KPI.NumericMethods.Interpolation
 
         public void ImportPointsFromTask2()
         {
-            (double, double)[] tuples = new[] { (0, 0.33), (2.5, 0.39), (5.8, 0.43), (7.9, 0.45)};
+            (double, double)[] tuples = new[] { (0.2, 1.22), (0.4, 1.53), (0.6, 1.98), (0.8, 2.8), (1, 4.75)};
             Nodes = Node.From(tuples).ToSortedBindableCollection();
             SeriesViewModel = new SeriesViewModel(Nodes);
         }
@@ -119,7 +119,7 @@ namespace KPI.NumericMethods.Interpolation
 
         public void InterpolatePoint(string interpolateFrom)
         {
-            Interpolated = SecondNewton.InterpolateFrom(Nodes, double.Parse(interpolateFrom)).Result;
+            Interpolated = Stirling.InterpolateFrom(Nodes, double.Parse(interpolateFrom)).Result;
         }
     }
 }

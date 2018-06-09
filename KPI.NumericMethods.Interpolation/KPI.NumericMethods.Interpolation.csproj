@@ -78,7 +78,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Algorithms\Bessel.cs" />
     <Compile Include="Algorithms\SecondNewton.cs" />
+    <Compile Include="Algorithms\Stirling.cs" />
+    <Compile Include="Algorithms\StirlingBessel.cs" />
     <Compile Include="ViewModels\SeriesViewModel.cs" />
     <Page Include="InterpolationView.xaml">
       <SubType>Designer</SubType>
