@@ -22,15 +22,15 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
 
         private void Interpolate(double point)
         {
-            (double baseValue, int baseIndex) = CalculateBase(point);
+            (_, int baseIndex) = CalculateBase(point);
             int stoppedAt = PopulateCache(baseIndex);
 
-            var lengths = Enumerable.Range(1, stoppedAt - 1);
+            var lengths = stoppedAt < 2 ? Enumerable.Empty<int>() : Enumerable.Range(2, stoppedAt - 2);
 
             Result = lengths
                 .Aggregate<int, double>(_values[baseIndex].Y, (acc, length) => acc
                     + CachedDelta(baseIndex, length)
-                        * Enumerable.Range(0, length).Aggregate<int, double>(1, (xAcc, cur) => xAcc * (point - _values[cur + baseIndex].X)) / Factorial(length));
+                        * Enumerable.Range(0, length - 1).Aggregate<int, double>(1, (xAcc, cur) => xAcc * (point - _values[cur + baseIndex].X)) / Factorial(length));
         }
 
         private (double baseValue, int baseIndex) CalculateBase(double point)
@@ -67,11 +67,11 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
             var d = 2;
             var epsilon = 5 * Math.Pow(10, -d);
 
-            for (int length = 1; length <= _values.Length - baseIndex; length++)
+            for (int length = 1; length + baseIndex < _values.Length; length++)
             {
                 bool isLargerThanEpsilon = false;
 
-                for (int from = baseIndex; from + length <= _values.Length; from++)
+                for (int from = baseIndex; from + length < _values.Length; from++)
                 {
                     var delta = CalculateDelta(from, length);
                     _cache[GetCacheKey(from, length)] = delta;
@@ -83,7 +83,7 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
                     return length;
             }
 
-            return _values.Length;
+            return _values.Length- baseIndex;
         }
 
         private double CalculateDelta(int from, int length)

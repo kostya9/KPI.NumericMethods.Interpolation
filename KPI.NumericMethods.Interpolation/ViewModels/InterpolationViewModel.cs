@@ -3,6 +3,7 @@ using KPI.NumericMethods.Interpolation.Algorithms;
 using KPI.NumericMethods.Interpolation.Extensions;
 using KPI.NumericMethods.Interpolation.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace KPI.NumericMethods.Interpolation
@@ -82,6 +83,8 @@ namespace KPI.NumericMethods.Interpolation
             Nodes = Node.From(tuples).ToSortedBindableCollection();
             SeriesViewModel = new SeriesViewModel(Nodes);
             _algorithm = (i) => SecondNewton.InterpolateFrom(_nodes, i).Result;
+            SeriesViewModel.RemoveGraph();
+            SeriesViewModel.AddGraph(GetGraphNodes());
         }
 
         public void ImportPointsFromTask2()
@@ -90,6 +93,18 @@ namespace KPI.NumericMethods.Interpolation
             Nodes = Node.From(tuples).ToSortedBindableCollection();
             SeriesViewModel = new SeriesViewModel(Nodes);
             _algorithm = (i) => StirlingBessel.InterpolateFrom(_nodes, i).Result;
+            SeriesViewModel.RemoveGraph();
+            SeriesViewModel.AddGraph(GetGraphNodes());
+        }
+
+        private IEnumerable<Node> GetGraphNodes()
+        {
+            var last = _nodes.Reverse().First().X;
+            var first = _nodes.First().X;
+            for(double cur = first; cur < last; cur += 0.5)
+            {   
+                yield return Node.From((cur, _algorithm(cur)));
+            }
         }
 
         public bool CanAddPoint(string point, string value)
@@ -107,6 +122,8 @@ namespace KPI.NumericMethods.Interpolation
             var node = Node.From((parsedPoint, parsedValue));
             Nodes.InsertSorted(node);
             SeriesViewModel.Add(node);
+            SeriesViewModel.RemoveGraph();
+            SeriesViewModel.AddGraph(GetGraphNodes());
         }
 
         public void RemoveItem()
@@ -114,6 +131,8 @@ namespace KPI.NumericMethods.Interpolation
             var node = SelectedNode;
             Nodes.Remove(node);
             SeriesViewModel.Remove(node);
+            SeriesViewModel.RemoveGraph();
+            SeriesViewModel.AddGraph(GetGraphNodes());
         }
 
         public bool CanInterpolatePoint(string interpolateFrom)

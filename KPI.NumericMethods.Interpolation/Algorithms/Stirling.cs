@@ -31,7 +31,7 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
             (var baseValue, var baseIndex) = CalculateBase(_values, point);
 
             // Elements from baseIndex to top and bottom that are used fot interpolating
-            var elements = baseIndex > (_values.Length - baseIndex) ? (_values.Length - baseIndex) : baseIndex;
+            var elements = baseIndex > (_values.Length - baseIndex - 1) ? (_values.Length - baseIndex - 1) : baseIndex;
 
             int stoppedAt = PopulateCache(baseIndex, elements);
 
