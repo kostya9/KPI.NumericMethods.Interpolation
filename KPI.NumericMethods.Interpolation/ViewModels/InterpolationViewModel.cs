@@ -89,7 +89,7 @@ namespace KPI.NumericMethods.Interpolation
 
         public void ImportPointsFromTask2()
         {
-            (double, double)[] tuples = new[] { (0, 0), (Math.PI / 4, 1.629), (Math.PI  / 2, 2.162), (3 * Math.PI / 4, 2.037), (Math.PI, 1.464), (5 * Math.PI / 4, 0.87), (3 * Math.PI / 2, 0.67) };
+            (double, double)[] tuples = new[] { (0.00,0.00),(0.79,1.84),(1.57,2.17),(2.36,1.58),(3.14,0.83),(3.93,0.75),(4.71,1.54),(5.50,2.57),(6.28,2.99),(7.07,2.49),(7.85,1.61),(8.64,1.22),(9.42,1.75),(10.21,2.77),(11.00,3.40),(11.78,3.12),(12.57,2.23),(13.35,1.61),(14.14,1.87),(14.92,2.82),(15.71,3.63)};
             Nodes = Node.From(tuples).ToSortedBindableCollection();
             SeriesViewModel = new SeriesViewModel(Nodes);
             _algorithm = (i) => StirlingBessel.InterpolateFrom(_nodes, i).Result;
