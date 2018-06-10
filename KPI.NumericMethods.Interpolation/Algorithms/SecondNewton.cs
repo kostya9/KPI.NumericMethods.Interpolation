@@ -26,13 +26,11 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
             int stoppedAt = PopulateCache(baseIndex);
 
             var lengths = Enumerable.Range(1, stoppedAt - 1);
-            var step = _values[0].X - _values[1].X;
-            var q = (point - _values[baseIndex].X) / step;
 
             Result = lengths
                 .Aggregate<int, double>(_values[baseIndex].Y, (acc, length) => acc
                     + CachedDelta(baseIndex, length)
-                        * Enumerable.Range(0, length).Aggregate<int, double>(1, (qAcc, cur) => qAcc * (q - cur)) / Factorial(length));
+                        * Enumerable.Range(0, length).Aggregate<int, double>(1, (xAcc, cur) => xAcc * (point - _values[cur + baseIndex].X)) / Factorial(length));
         }
 
         private (double baseValue, int baseIndex) CalculateBase(double point)
