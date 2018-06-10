@@ -64,7 +64,7 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
         /// <returns>The length of latest populated entry</returns>
         private int PopulateCache(int baseIndex)
         {
-            var d = 2;
+            var d = 100;
             var epsilon = 5 * Math.Pow(10, -d);
 
             for (int length = 1; length + baseIndex < _values.Length; length++)
@@ -75,7 +75,7 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
                 {
                     var delta = CalculateDelta(from, length);
                     _cache[GetCacheKey(from, length)] = delta;
-                    if (delta > epsilon)
+                    if (Math.Abs(delta) > epsilon)
                         isLargerThanEpsilon = true;
                 }
 

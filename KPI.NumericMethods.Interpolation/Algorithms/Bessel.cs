@@ -94,7 +94,7 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
                 {
                     var delta = CalculateDelta(baseIndex, from, length);
                     _cache[GetCacheKey(from, length)] = delta;
-                    if (delta > epsilon)
+                    if (Math.Abs(delta) > epsilon)
                         isLargerThanEpsilon = true;
                 }
 
