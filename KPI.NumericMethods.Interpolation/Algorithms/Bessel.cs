@@ -83,7 +83,7 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
         /// <returns>The length of latest populated entry</returns>
         private int PopulateCache(int baseIndex, int elements)
         {
-            var d = 2;
+            var d = 3;
             var epsilon = 5 * Math.Pow(10, -d);
 
             for (int length = 0; length < 2 * elements + 2; length++)
