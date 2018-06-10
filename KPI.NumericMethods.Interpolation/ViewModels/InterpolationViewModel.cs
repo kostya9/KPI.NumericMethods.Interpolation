@@ -12,6 +12,7 @@ namespace KPI.NumericMethods.Interpolation
         private BindableCollection<Node> _nodes;
         private Node _selected;
         private double _interpolated;
+        private Func<double, double> _algorithm;
         private SeriesViewModel _seriesViewModel;
 
         public BindableCollection<Node> Nodes
@@ -72,6 +73,7 @@ namespace KPI.NumericMethods.Interpolation
         {
             Nodes = new BindableCollection<Node>();
             SeriesViewModel = new SeriesViewModel(Enumerable.Empty<Node>());
+            _algorithm = (i) => SecondNewton.InterpolateFrom(_nodes, i).Result;
         }
 
         public void ImportPointsFromTask1()
@@ -79,13 +81,15 @@ namespace KPI.NumericMethods.Interpolation
             (double, double)[] tuples = new[] { (-2.987, -16.593), (-2.966, -16.449), (-2.259, -12.305), (-2.132, -11.656), (-1.808, -10.039), (-1.614, -9.053), (-1.597, -8.970), (-1.575, -8.854), (-1.251, -7.089), (-1.108, -6.250), (-0.793, -4.243), (-0.788, -4.209), (-0.564, -2.641), (-0.427, -1.626), (-0.399, -1.410), (-0.319, -0.800), (-0.024, 1.556), (0.604, 6.821), (0.760, 8.109), (0.902, 9.257), (0.939, 9.553), (1.036, 10.320), (1.249, 11.929), (1.294, 12.261), (1.827, 15.796), (1.951, 16.524), (2.238, 18.097), (2.989, 21.863), (4.064, 28.948), (4.851, 37.111), (5.334, 43.209), (6.011, 51.996), (6.394, 56.453) };
             Nodes = Node.From(tuples).ToSortedBindableCollection();
             SeriesViewModel = new SeriesViewModel(Nodes);
+            _algorithm = (i) => SecondNewton.InterpolateFrom(_nodes, i).Result;
         }
 
         public void ImportPointsFromTask2()
         {
-            (double, double)[] tuples = new[] { (0.2, 1.22), (0.4, 1.53), (0.6, 1.98), (0.8, 2.8), (1, 4.75)};
+            (double, double)[] tuples = new[] { (0, 0), (Math.PI / 4, 1.629), (Math.PI  / 2, 2.162), (3 * Math.PI / 4, 2.037), (Math.PI, 1.464), (5 * Math.PI / 4, 0.87), (3 * Math.PI / 2, 0.67) };
             Nodes = Node.From(tuples).ToSortedBindableCollection();
             SeriesViewModel = new SeriesViewModel(Nodes);
+            _algorithm = (i) => StirlingBessel.InterpolateFrom(_nodes, i).Result;
         }
 
         public bool CanAddPoint(string point, string value)
@@ -119,7 +123,12 @@ namespace KPI.NumericMethods.Interpolation
 
         public void InterpolatePoint(string interpolateFrom)
         {
-            Interpolated = StirlingBessel.InterpolateFrom(Nodes, double.Parse(interpolateFrom)).Result;
+            var value = double.Parse(interpolateFrom);
+
+            if (value > _nodes.Last().X || value < _nodes.First().X)
+                throw new ArgumentException("Please provide a value betweeen first and last point");
+
+            Interpolated = _algorithm(value);
         }
     }
 }

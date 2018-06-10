@@ -22,30 +22,58 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
 
         private void Interpolate(double point)
         {
-            int stoppedAt = PopulateCache();
+            (double baseValue, int baseIndex) = CalculateBase(point);
+            int stoppedAt = PopulateCache(baseIndex);
 
             var lengths = Enumerable.Range(1, stoppedAt - 1);
+            var step = _values[0].X - _values[1].X;
+            var q = (point - _values[baseIndex].X) / step;
 
             Result = lengths
-                .Aggregate<int, double>(0, (acc, length) => acc
-                    + CachedDelta(0, length)
-                        * _values.Take(length - 1).Select(v => v.X).Aggregate<double, double>(1, (xAcc, x) => xAcc * (point - x)));
+                .Aggregate<int, double>(_values[baseIndex].Y, (acc, length) => acc
+                    + CachedDelta(baseIndex, length)
+                        * Enumerable.Range(0, length).Aggregate<int, double>(1, (qAcc, cur) => qAcc * (q - cur)) / Factorial(length));
+        }
+
+        private (double baseValue, int baseIndex) CalculateBase(double point)
+        {
+            var baseValue = double.MaxValue;
+            var baseIndex = -1;
+            for (var i = 0; i < _values.Length; i++)
+            {
+                var value = _values[i].X;
+                if (Math.Abs(point - value) < Math.Abs(point - baseValue))
+                {
+                    baseValue = value;
+                    baseIndex = i;
+                }
+            }
+
+            return (baseValue, baseIndex);
+        }
+
+        private double Factorial(int i)
+        {
+            double result = 1;
+            for (; i != 1; i--)
+                result = result * i;
+            return result;
         }
 
         /// <summary>
         /// Populates cache and returns the length of latest populated entry
         /// </summary>
         /// <returns>The length of latest populated entry</returns>
-        private int PopulateCache()
+        private int PopulateCache(int baseIndex)
         {
             var d = 2;
             var epsilon = 5 * Math.Pow(10, -d);
 
-            for (int length = 1; length <= _values.Length; length++)
+            for (int length = 1; length <= _values.Length - baseIndex; length++)
             {
                 bool isLargerThanEpsilon = false;
 
-                for (int from = 0; from + length <= _values.Length; from++)
+                for (int from = baseIndex; from + length <= _values.Length; from++)
                 {
                     var delta = CalculateDelta(from, length);
                     _cache[GetCacheKey(from, length)] = delta;
