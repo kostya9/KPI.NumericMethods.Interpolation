@@ -119,7 +119,7 @@ namespace KPI.NumericMethods.Interpolation
 
         public void InterpolatePoint(string interpolateFrom)
         {
-            Interpolated = Stirling.InterpolateFrom(Nodes, double.Parse(interpolateFrom)).Result;
+            Interpolated = StirlingBessel.InterpolateFrom(Nodes, double.Parse(interpolateFrom)).Result;
         }
     }
 }

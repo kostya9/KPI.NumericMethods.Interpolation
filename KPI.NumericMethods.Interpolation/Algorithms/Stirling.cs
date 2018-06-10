@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KPI.NumericMethods.Interpolation.Algorithms
 {
@@ -20,23 +18,20 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
             _cache = new Dictionary<string, double>();
         }
 
+        public static double Q(Node[] nodes, double point)
+        {
+            (var baseValue, _) = CalculateBase(nodes, point);
+            var step = nodes[1].X - nodes[0].X;
+            return (point - baseValue) / step;
+        }
+
         private void Interpolate(double point)
         {
             // Calculating the base of the interpolation
-            var baseValue = double.MaxValue;
-            var baseIndex = -1;
-            for(var i = 0; i < _values.Length; i++)
-            {
-                var value = _values[i].X;
-                if (Math.Abs(point - value) < Math.Abs(point - baseValue))
-                {
-                    baseValue = value;
-                    baseIndex = i;
-                }
-            }
+            (var baseValue, var baseIndex) = CalculateBase(_values, point);
 
             // Elements from baseIndex to top and bottom that are used fot interpolating
-            var elements = baseIndex > (_values.Length - baseIndex) ? (_values.Length - baseIndex) : baseIndex; 
+            var elements = baseIndex > (_values.Length - baseIndex) ? (_values.Length - baseIndex) : baseIndex;
 
             int stoppedAt = PopulateCache(baseIndex, elements);
 
@@ -46,9 +41,35 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
             var qSquare = q * q;
 
             Result = powers
-                .Aggregate(_values[baseIndex].Y, (acc, power) => acc 
-                    + (power % 2 == 1 ? q * (CachedDelta(-power/2 - 1, power) + CachedDelta(-power/2, power)) / 2 : qSquare * CachedDelta(-power/2, power)) 
-                    * Multiply(qSquare, (power - 1) / 2));
+                .Aggregate(_values[baseIndex].Y, (acc, power) => acc
+                    + ((power % 2 == 1 ? q * (CachedDelta(-power / 2 - 1, power) + CachedDelta(-power / 2, power)) / 2 : qSquare * CachedDelta(-power / 2, power))
+                    * Multiply(qSquare, (power - 1) / 2))
+                    / Factorial(power));
+        }
+
+        private static (double baseValue, int baseIndex) CalculateBase(Node[] nodes, double point)
+        {
+            var baseValue = double.MaxValue;
+            var baseIndex = -1;
+            for (var i = 0; i < nodes.Length; i++)
+            {
+                var value = nodes[i].X;
+                if (Math.Abs(point - value) < Math.Abs(point - baseValue))
+                {
+                    baseValue = value;
+                    baseIndex = i;
+                }
+            }
+
+            return (baseValue, baseIndex);
+        }
+
+        private double Factorial(int i)
+        {
+            double result = 1;
+            for (; i != 1; i--)
+                result = result * i;
+            return result;
         }
 
         // (q^2 - 1) * (q^2 - 2) ...
