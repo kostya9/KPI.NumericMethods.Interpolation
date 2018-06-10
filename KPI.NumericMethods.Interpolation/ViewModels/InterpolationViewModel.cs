@@ -99,8 +99,9 @@ namespace KPI.NumericMethods.Interpolation
 
         private IEnumerable<Node> GetGraphNodes()
         {
-            var last = _nodes.Reverse().First().X;
-            var first = _nodes.First().X;
+            var curNodes = _nodes.OrderBy(n => n);
+            var last = curNodes.Reverse().First().X;
+            var first = curNodes.First().X;
             for(double cur = first; cur < last; cur += 0.5)
             {   
                 yield return Node.From((cur, _algorithm(cur)));

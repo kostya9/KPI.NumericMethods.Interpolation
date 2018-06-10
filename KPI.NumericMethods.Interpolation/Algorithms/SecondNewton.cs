@@ -50,14 +50,6 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
             return (baseValue, baseIndex);
         }
 
-        private double Factorial(int i)
-        {
-            double result = 1;
-            for (; i != 1; i--)
-                result = result * i;
-            return result;
-        }
-
         /// <summary>
         /// Populates cache and returns the length of latest populated entry
         /// </summary>
@@ -83,7 +75,7 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
                     return length;
             }
 
-            return _values.Length- baseIndex;
+            return _values.Length - baseIndex;
         }
 
         private double CalculateDelta(int from, int length)
@@ -100,6 +92,14 @@ namespace KPI.NumericMethods.Interpolation.Algorithms
 
         private double CachedDelta(int from, int length)
             => _cache[GetCacheKey(from, length)];
+
+        private double Factorial(int i)
+        {
+            double result = 1;
+            for (; i != 1; i--)
+                result = result * i;
+            return result;
+        }
 
         public static SecondNewton InterpolateFrom(IEnumerable<Node> nodes, double value)
         {
